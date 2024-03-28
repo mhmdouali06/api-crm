@@ -20,7 +20,13 @@ class RoleSeeder extends Seeder
         $permissions = [
             'create_user',
             'update_user',
-            'delete_user'
+            'delete_user',
+            'view_user',
+            'create_roles',
+            'update_roles',
+            'delete_roles',
+            'view_roles',
+
         ];
         
         foreach ($permissions as $permissionName) {
