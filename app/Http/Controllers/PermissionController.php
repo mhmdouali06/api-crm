@@ -14,7 +14,7 @@ class PermissionController extends Controller
     {
         $permissions = Permission::all();
         return response()->json($permissions);
-        }
+    }
 
     /**
      * Store a newly created resource in storage.

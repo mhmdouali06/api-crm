@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 class RoleController extends Controller
 {
     public function __construct(){
-        $this->middleware('permission:view_roles', ['only' => ['index','show']]);
+        $this->middleware('permission:view_roles|view_user', ['only' => ['index','show']]);
         $this->middleware('permission:create_roles', ['only' => ['store']]);
         $this->middleware('permission:update_roles', ['only' => ['update']]);
         $this->middleware('permission:delete_roles', ['only' => ['destroy']]);
@@ -65,6 +65,7 @@ class RoleController extends Controller
                 $role->givePermissionTo($permission);
             }
         }
+        $role->syncPermissions($request->permissions);
         return response()->json($role);
 
     }
@@ -74,7 +75,7 @@ class RoleController extends Controller
      */
     public function show(string $id )
     {
-        $role = Role::find($id);
+        $role = Role::with('permissions')->find($id);
         if($role){
             return response()->json($role);
         }
@@ -84,14 +85,33 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        $role = Role::find($id);
-        if($role){
-            $role->update($request->all());
-            return response()->json($role);
-        }
+   /**
+ * Update the specified resource in storage.
+ */
+public function update(Request $request, string $id)
+{
+   
+    $role = Role::find($id);
+
+    if (!$role) {
+        return response()->json(['error' => 'Role not found'], 404);
     }
+
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'permissions' => 'required|array',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
+    }
+
+    $role->update(['name' => $request->name]);
+    $role->syncPermissions($request->permissions);
+
+    return response()->json($role);
+}
+
 
     /**
      * Remove the specified resource from storage.

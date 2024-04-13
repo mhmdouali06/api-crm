@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PermissionController;
 
 /*
@@ -24,8 +26,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware("auth:api")->group(function(){
     Route::get("/me",[AuthController::class,'me']);
     Route::apiResource("roles",RoleController::class);
+    Route::post("update_role/{role}",[RoleController::class,'update']);
     Route::apiResource("permissions",PermissionController::class);
     Route::apiResource("users",UserController::class); 
+    Route::post("update_user/{user}",[UserController::class,'update']);
+    Route::apiResource("suppliers",SupplierController::class);
+    Route::post("update_supplier/{supplier}",[SupplierController::class,'update']);
+    Route::apiResource("categories",CategoryController::class);
+    Route::post("update_category/{category}",[CategoryController::class,'update']);
+
+    Route::post("logout",[AuthController::class,'logout']);
 });
 Route::post("login",[AuthController::class,'login']);
 

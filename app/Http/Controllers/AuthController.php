@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -42,14 +43,25 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth()->user());
+        $user=auth()->user()->load('roles.permissions');
+        $user=UserResource::make($user);
+        return response()->json($user);
     }
-
+    // public function me()
+    // {
+    //     $user = auth()->user()->width("roles","roles:permission");
+    //     $roles = $user->roles()->with('permissions')->get(); 
+    
+    //     return response()->json([
+    //         'user' => $user,
+    //         'roles' => $roles,
+    //     ]);
+    // }
     /**
      * Log the user out (Invalidate the token).
      *
      * @return \Illuminate\Http\JsonResponse
-     */
+     */ 
     public function logout()
     {
         auth()->logout();
@@ -77,7 +89,7 @@ class AuthController extends Controller
     protected function respondWithToken($token)
     {
         return response()->json([
-            'access_token' => $token,
+            'api_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
         ]);
